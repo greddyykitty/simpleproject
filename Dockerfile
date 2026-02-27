@@ -1,5 +1,4 @@
-# Stage 1: build
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 WORKDIR /app
 
 # install dependencies
@@ -10,11 +9,11 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Stage 2: serve
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
+# install serve to run the static build
+RUN npm install -g serve
 
-# optional: expose port
-EXPOSE 8080
+# expose port
+EXPOSE 5000
 
-CMD ["nginx", "-g", "daemon on;"]
+# serve the built app
+CMD ["serve", "-s", "dist", "-l", "5000"]
